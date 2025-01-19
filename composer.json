@@ -1,0 +1,28 @@
+{
+    "name": "benhensor/bookaroo_php_backend",
+    "description": "bookaroo_php_backend",
+    "type": "project",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "benhensor",
+            "email": "benhensor@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "firebase/php-jwt": "^6.0",
+        "vlucas/phpdotenv": "^5.5",
+        "ext-pdo": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            
+            "Controllers\\": "controllers/",
+            "Models\\": "models/",
+            "Config\\": "config/"
+        }
+    }
+}

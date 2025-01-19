@@ -1,0 +1,18 @@
+id,email,username,postcode,password,latitude,longitude,preferences,liked_books
+1,brian84@geemail.com,Brystyle,NW10 2HL,$2a$10$tQim1nXe4qUW5edLlQca3eOAJj5N.sWocEcbg5S6pf9flYb1DG.WS,51.544618,-0.237308,"[""Mystery"",""Comedy"",""Romance""]","[""20"",""42"",""58"",""63"",""62"",""64"",""67""]"
+2,chopperread@geemail.com,Chopper,RH12 1RS,$2a$10$NlQyYf8FX4lp/K.JWXeqeOAFy7Qgd2o1RSB2kEGyUY7izFVZT9e0q,51.060034,-0.341008,[],[]
+3,sossage@geemail.com,Simon Ossage,S2 2SS,$2a$10$RdKhOBOdtnAobcZqr6ynWugx2GBBDizAWklSbHsSNTzrYI3/4EQbi,53.377931,-1.456327,"[""Mystery"",""Comedy""]","[""61"",""63"",""67"",""75"",""87"",""88"",""111"",""11"",""23"",""24"",""34"",""31"",""30"",""64"",""26"",""27"",""47""]"
+4,slightlysusan@geemail.com,Susan,LS6 2AQ,$2a$10$R7yu/Xutvh3CP.4y0CF9Su6Lc4VNaWptYdvhnyNqy/uAyN2tPOERy,53.823417,-1.572807,[],[]
+5,emmy562@geemail.com,EmmyWinks,W10 6NP,$2a$10$6Y8f/8T87Zzl1aXFOUs3xuZgy/9833Kre0DimRSQW3gjeW2.QbRkW,51.519687,-0.218115,[],[]
+6,shazza85@geemail.com,Sharon,OX3 9BJ,$2a$10$xMBqS/IV96B2n3zn1sskpO0uDAZ2w6nQwnL6NWxN4k1S2WBGID9S6,51.761022,-1.213765,[],[]
+7,chozza91@geemail.com,Chozza,BN2 1JG,$2a$10$KIdtJshpPvWrTmVT6VxcR.s0dER.uwrwOvwXIKcWDhFolI2uSFa2i,50.819959,-0.123495,[],[]
+8,gman@geemail.com,Graham,GL51 9BX,$2a$10$qMR9LrR8YyAAlK8rOplNEOKUrRzb.vHazGuIvCoZtZ8THwDsOCr/e,51.910125,-2.090301,"[""Comedy"",""Science Fiction"",""Thriller/Suspense""]",[]
+9,scaryterry@geemail.com,Terry,CF5 5DZ,$2a$10$e8BKZbySqtO8K1Eyqeag2esVs0bZSzf0OCIVvu2QRPuvsuLR3DuI2,51.474508,-3.239925,[],[]
+10,katie235@geemail.com,Katie,BS13 7HW,$2a$10$GBgDvQkPU/2/13VubI0qDOiNrrWAI8q.7kM0h9ji5X6EzMf8Wo1ba,51.429999,-2.611322,"[""Comedy"",""Thriller/Suspense"",""Young Adult""]",[]
+11,oddbeans@geemail.com,SlightlyOdd,HR1 2NX,$2a$10$e7FtgX6gBa3U9TptabMWcudBtorUwPs.Z92E2myGEBNthi.cZOU/C,52.052247,-2.710286,[],[]
+12,paige123@geemail.com,PaigeTurner,NR1 3AS,$2a$10$.WKAH9BbOatWUiIByISXb.6xpuE2eXRYtILRnljI88FpIs9Gvm2Mi,52.618089,1.29996,"[""Mystery"",""Fantasy"",""Young Adult""]",[]
+13,berylperil@geemail.com,Beryl,PL3 4NF,$2a$10$ZqL.XPeTtUfe58Qj8tLg8emWW9EjulyfqK938d2.12uGpoAxbkyqi,50.391608,-4.143154,"[""Comedy"",""Fantasy"",""Non-Fiction"",""Biography & Autobiography""]","[""4"",""8"",""14"",""16"",""19"",""20""]"
+14,fishybob@geemail.com,FishyBob,PE1 5JQ,$2a$10$7VzmgKtfZc5qO/iE10Q5xuhvcS3/0//2xB8loBYY4NI5YC28FN7BC,52.578841,-0.223973,"[""History"",""Historical Fiction"",""Mystery""]",[]
+15,bennyboozles@geemail.com,bennee,RH13 5AP,$2a$10$lTAJ4eR6ZGXn97W5OveRKu1FxVZ8jND0kyNT.q1nmhs4Grme2FdvW,51.058558,-0.324823,[],[]
+16,kevin.moya1301@gmail.com,ggg,HP11 1RJ,$2a$10$41gHCSyvmK9VCS93HwVhMuL6LJhOH9Gwbk20ZOzx9u.3UKhKZU/I2,51.618278,-0.716789,[],[]
+17,ziutton@gmail.com,ggggg,KT15 3NB,$2a$10$ot/aH6r4uoPCDqiS/Ix17O0IZlCez.CLTbl5cAZq7qCSNcoKcQ3be,51.353567,-0.493682,[],[]
