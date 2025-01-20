@@ -15,12 +15,14 @@
         "firebase/php-jwt": "^6.0",
         "vlucas/phpdotenv": "^5.5",
         "ext-pdo": "*",
-        "ext-json": "*"
+        "ext-json": "*",
+        "guzzlehttp/guzzle": "^7.9"
     },
     "autoload": {
         "psr-4": {
             
             "Controllers\\": "controllers/",
+            "Middleware\\": "middleware/",
             "Models\\": "models/",
             "Config\\": "config/"
         }

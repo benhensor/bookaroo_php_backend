@@ -7,6 +7,11 @@ class User {
     public function __construct() {
         $this->db = \Config\Database::getInstance()->getConnection();
     }
+
+    public function findAll() {
+        $stmt = $this->db->query("SELECT * FROM users");
+        return $stmt->fetchAll();
+    }
     
     public function findByEmail($email) {
         $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");
@@ -30,6 +35,22 @@ class User {
             json_encode($data['preferences'] ?? []),
             json_encode($data['liked_books'] ?? [])
         ]);
+    }
+
+    public function update($id, $data) {
+        $fields = '';
+        $values = [];
+        
+        foreach ($data as $key => $value) {
+            $fields .= "$key = ?, ";
+            $values[] = $value;
+        }
+        
+        $fields = rtrim($fields, ', ');
+        $values[] = $id;
+        
+        $stmt = $this->db->prepare("UPDATE users SET $fields WHERE id = ?");
+        return $stmt->execute($values);
     }
     
     public function findById($id) {
