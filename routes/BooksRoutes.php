@@ -44,16 +44,8 @@ switch ($method) {
     break;
 
   case 'DELETE':
-    switch ($action) {
-      case ':bookId':
-        $controller->deleteListing($pathParts[4]);
-        break;
-        
-      default:
-        http_response_code(404);
-        echo json_encode(['error' => 'Route not found']);
-        break;
-    }
+    $bookId = $pathParts[3]; 
+    $controller->deleteListing($bookId);
     break;
 
   default:

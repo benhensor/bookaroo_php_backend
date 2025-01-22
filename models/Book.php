@@ -13,10 +13,22 @@ class Book {
 
     public function create($data) {
         try {
+            // Format the category data - convert array to JSON string
+            $formattedData = $data;
+            if (isset($formattedData['category']) && is_array($formattedData['category'])) {
+                $formattedData['category'] = json_encode($formattedData['category']);
+            }
+            
+            // Also ensure we're using book_condition not condition
+            if (isset($formattedData['condition'])) {
+                $formattedData['book_condition'] = $formattedData['condition'];
+                unset($formattedData['condition']);
+            }
+    
             $fields = [
-                'isbn', 'coverImg', 'title', 'author', 'publishedDate',
-                'publisher', 'category', 'condition', 'notes', 'userId',
-                'bookLatitude', 'bookLongitude'
+                'isbn', 'cover_img', 'title', 'author', 'published_date',
+                'publisher', 'category', 'book_condition', 'notes', 'user_id',
+                'book_latitude', 'book_longitude'
             ];
             
             $placeholders = array_fill(0, count($fields), '?');
@@ -24,12 +36,12 @@ class Book {
                     VALUES (" . implode(', ', $placeholders) . ")";
             
             $stmt = $this->db->prepare($sql);
-            $stmt->execute(array_map(fn($field) => $data[$field], $fields));
+            $stmt->execute(array_map(fn($field) => $formattedData[$field], $fields));
             
             return $this->findById($this->db->lastInsertId());
         } catch (PDOException $e) {
             error_log("Database error in create: " . $e->getMessage());
-            throw new \Exception('Error creating book listing');
+            throw new \Exception('Error creating book listing: ' . $e->getMessage());
         }
     }
 
@@ -121,10 +133,22 @@ class Book {
         }
     }
 
-    public function findAll() {
+    public function findAll($options = []) {
         try {
-            $stmt = $this->db->prepare("SELECT * FROM books");
-            $stmt->execute();
+            $sql = "SELECT * FROM books";
+            $params = [];
+    
+            if (!empty($options['where'])) {
+                if (isset($options['where']['id']) && is_array($options['where']['id'])) {
+                    $ids = $options['where']['id'];
+                    $placeholders = rtrim(str_repeat('?,', count($ids)), ',');
+                    $sql .= " WHERE id IN ($placeholders)";
+                    $params = $ids;
+                }
+            }
+    
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute($params);
             return $stmt->fetchAll(PDO::FETCH_OBJ);
         } catch (PDOException $e) {
             error_log("Database error in findAll: " . $e->getMessage());

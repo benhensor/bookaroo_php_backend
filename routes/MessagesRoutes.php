@@ -37,12 +37,12 @@ switch ($method) {
 
   case 'PUT':
     switch ($action) {
-      case 'read/:id':
-        $controller->markAsRead($pathparts[4]);
+      case 'read':
+        $controller->markAsRead($pathParts[4]);
         break;
       
-      case 'unread/:id':
-        $controller->markAsUnread($pathparts[4]);
+      case 'unread':
+        $controller->markAsUnread($pathParts[4]);
         break;
 
       default:
@@ -53,16 +53,7 @@ switch ($method) {
     break;
 
   case 'DELETE':
-    switch ($action) {
-      case 'delete/:id':
-        $controller->deleteMessage($pathparts[4]);
-        break;
-
-      default:
-        http_response_code(404);
-        echo json_encode(['error' => 'Route not found']);
-        break;
-    }
+    $controller->deleteMessage($pathParts[3]);
     break;
 
   default:

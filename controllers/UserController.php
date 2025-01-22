@@ -31,6 +31,9 @@ class UserController {
                 return;
             }
 
+            $preferences = json_decode($data->preferences);
+            $data->preferences = is_array($preferences) ? $preferences : [];
+
             // Exclude password from response
             unset($data->password);
             
@@ -98,10 +101,13 @@ class UserController {
     }
 
     public function updateUserDetails() {
+        error_log('Update user details endpoint hit');
+        error_log('Request body: ' . file_get_contents('php://input'));
         try {
             $user = AuthMiddleware::authenticate();
             $data = json_decode(file_get_contents('php://input'), true);
             
+            error_log('Decoded data: ' . print_r($data, true));
             $username = $data['username'] ?? null;
             $email = $data['email'] ?? null;
             $postcode = $data['postcode'] ?? null;
@@ -117,7 +123,7 @@ class UserController {
                 "https://api.geocodify.com/v2/geocode",
                 [
                     'query' => [
-                        'api_key' => getenv('GEOCODIFY_API_KEY'),
+                        'api_key' => $_ENV['GEOCODIFY_API_KEY'],
                         'q' => $postcode
                     ]
                 ]
@@ -166,69 +172,71 @@ class UserController {
         try {
             $user = AuthMiddleware::authenticate();
             $data = json_decode(file_get_contents('php://input'), true);
-            $bookId = $data['bookId'] ?? null;
-
+            $bookId = $data['book_id'] ?? null;
+    
             if (!$bookId) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Book ID is required']);
                 return;
             }
-
+    
             $userData = $this->user->findById($user['id']);
-            $likedBooks = json_decode($userData->liked_books ?? '[]');
-
-            if (in_array($bookId, $likedBooks)) {
+            $likedBooks = json_decode($userData['liked_books'] ?? '[]');
+    
+            if (in_array((string)$bookId, $likedBooks)) {
                 http_response_code(400);
                 echo json_encode(['message' => 'Book is already liked']);
                 return;
             }
-
-            $likedBooks[] = $bookId;
+    
+            $likedBooks[] = (string)$bookId;
             $this->user->update($user['id'], ['liked_books' => json_encode($likedBooks)]);
-
+    
             http_response_code(200);
             echo json_encode([
                 'message' => 'Book liked successfully',
-                'likedBooks' => $likedBooks
+                'likedBooks' => $likedBooks,
+                'book_id' => $bookId  // Add the book_id to response
             ]);
-
+    
         } catch (\Exception $e) {
             error_log("Error liking book: " . $e->getMessage());
             http_response_code(500);
             echo json_encode(['error' => 'Internal server error']);
         }
     }
-
+    
     public function unlikeBook() {
         try {
             $user = AuthMiddleware::authenticate();
             $data = json_decode(file_get_contents('php://input'), true);
-            $bookId = $data['bookId'] ?? null;
-
+            $bookId = $data['book_id'] ?? null;
+    
             if (!$bookId) {
                 http_response_code(400);
                 echo json_encode(['error' => 'Book ID is required']);
                 return;
             }
-
+    
             $userData = $this->user->findById($user['id']);
-            $likedBooks = json_decode($userData->liked_books ?? '[]');
-
-            if (!in_array($bookId, $likedBooks)) {
+            $likedBooks = json_decode($userData['liked_books'] ?? '[]');
+    
+            if (!in_array((string)$bookId, $likedBooks)) {
                 http_response_code(400);
                 echo json_encode(['message' => 'Book is not liked']);
                 return;
             }
-
-            $likedBooks = array_values(array_filter($likedBooks, fn($id) => $id !== $bookId));
+    
+            $likedBooks = array_values(array_filter($likedBooks, fn($id) => $id !== (string)$bookId));
             $this->user->update($user['id'], ['liked_books' => json_encode($likedBooks)]);
-
+    
             http_response_code(200);
             echo json_encode([
                 'message' => 'Book unliked successfully',
-                'likedBooks' => $likedBooks
+                'likedBooks' => $likedBooks,
+                'book_id' => $bookId  // Add the book_id to response
             ]);
-
+    
         } catch (\Exception $e) {
             error_log("Error unliking book: " . $e->getMessage());
             http_response_code(500);
@@ -237,50 +245,55 @@ class UserController {
     }
 
     public function getLikedBooks() {
-        try {
-            $user = AuthMiddleware::authenticate();
-            
-            $userData = $this->user->findById($user['id']);
-            if (!$userData) {
-                http_response_code(404);
-                echo json_encode(['message' => 'User not found']);
-                return;
-            }
-
-            $likedBooks = json_decode($userData->liked_books ?? '[]');
-            if (empty($likedBooks)) {
-                http_response_code(200);
-                echo json_encode([]);
-                return;
-            }
-
-            $books = (new Book())->findAll([
-                'where' => ['id' => ['in' => $likedBooks]]
-            ]);
-
-            http_response_code(200);
-            echo json_encode($books);
-
-        } catch (\Exception $e) {
-            error_log("Error fetching liked books: " . $e->getMessage());
-            http_response_code(500);
-            echo json_encode(['error' => 'Internal server error']);
-        }
+      try {
+          $user = AuthMiddleware::authenticate();
+          
+          $userData = $this->user->findById($user['id']);
+          if (!$userData) {
+              http_response_code(404);
+              echo json_encode(['message' => 'User not found']);
+              return;
+          }
+  
+          // Change this line to use array access instead of property access
+          $likedBookIds = json_decode($userData['liked_books'] ?? '[]');
+          
+          if (empty($likedBookIds)) {
+              http_response_code(200);
+              echo json_encode([]);
+              return;
+          }
+  
+          $allBooks = (new Book())->findAll();
+          $likedBooks = array_filter($allBooks, function($book) use ($likedBookIds) {
+              return in_array((string)$book->id, $likedBookIds);
+          });
+  
+          http_response_code(200);
+          echo json_encode(array_values($likedBooks));
+  
+      } catch (\Exception $e) {
+          error_log("Error fetching liked books: " . $e->getMessage());
+          http_response_code(500);
+          echo json_encode(['error' => 'Internal server error']);
+      }
     }
 
     public function updatePreferences() {
         try {
             $user = AuthMiddleware::authenticate();
             $data = json_decode(file_get_contents('php://input'), true);
-            $preferences = $data['preferences'] ?? null;
+            $preferences = $data['preferences'] ?? [];
 
-            if (!$preferences) {
-                http_response_code(400);
-                echo json_encode(['error' => 'Preferences are required']);
-                return;
+            // Ensure preferences is an array
+            if (!is_array($preferences)) {
+                $preferences = [];
             }
 
-            $updated = $this->user->update($user['id'], ['preferences' => json_encode($preferences)]);
+            // Convert preferences to JSON string for storage
+            $preferencesJson = json_encode($preferences);
+
+            $updated = $this->user->update($user['id'], ['preferences' => $preferencesJson]);
             
             if (!$updated) {
                 http_response_code(404);
@@ -288,10 +301,11 @@ class UserController {
                 return;
             }
 
+            // Return decoded preferences in response
             http_response_code(200);
             echo json_encode([
                 'message' => 'Preferences updated successfully',
-                'preferences' => $preferences
+                'preferences' => $preferences  // Send back as array
             ]);
 
         } catch (\Exception $e) {

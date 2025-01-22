@@ -23,43 +23,65 @@ class BookController
       $user = AuthMiddleware::authenticate();
       $data = json_decode(file_get_contents('php://input'), true);
 
+      // Debug incoming data
+      error_log("Received data: " . json_encode($data));
+
       // Extract all required fields
       $requiredFields = [
         'isbn',
-        'coverImg',
+        'cover_img',
         'title',
         'author',
-        'publishedDate',
+        'published_date',
         'publisher',
         'category',
-        'condition',
+        'book_condition',
         'notes',
       ];
 
+      $missingFields = [];
       foreach ($requiredFields as $field) {
         if (!isset($data[$field])) {
-          http_response_code(400);
-          echo json_encode(['error' => "Missing required field: {$field}"]);
-          return;
+          $missingFields[] = $field;
         }
       }
 
+      if (!empty($missingFields)) {
+        http_response_code(400);
+        echo json_encode([
+          'error' => 'Missing required fields',
+          'details' => $missingFields,
+          'validation_errors' => $missingFields
+        ]);
+        return;
+      }
+
       // Check if user exists
-      $userData = $this->user->findById($user['userId']);
+      $userData = $this->user->findById($user['id']);
       if (!$userData) {
         http_response_code(404);
-        echo json_encode(['error' => 'User not found']);
+        echo json_encode([
+          'error' => 'User not found',
+          'details' => 'Invalid user ID',
+          'validation_errors' => []
+        ]);
         return;
       }
 
       // Create new book with user's location
       $bookData = array_merge($data, [
-        'userId' => $user['id'],
-        'bookLatitude' => $userData->latitude,
-        'bookLongitude' => $userData->longitude
+        'user_id' => $user['id'],
+        'book_latitude' => $userData['latitude'] ?? null,
+        'book_longitude' => $userData['longitude'] ?? null
       ]);
 
+      // Debug book data before creation
+      error_log("Attempting to create book with data: " . json_encode($bookData));
+
       $newBook = $this->book->create($bookData);
+      if (!$newBook) {
+        throw new \Exception('Database error while creating book');
+      }
 
       http_response_code(201);
       echo json_encode([
@@ -70,7 +92,11 @@ class BookController
     } catch (\Exception $e) {
       error_log("Error in createNewListing: " . $e->getMessage());
       http_response_code(400);
-      echo json_encode(['error' => $e->getMessage()]);
+      echo json_encode([
+        'error' => 'Error creating book listing',
+        'details' => $e->getMessage(),
+        'validation_errors' => []
+      ]);
     }
   }
 
@@ -87,7 +113,7 @@ class BookController
       }
 
       // Optional: Check if the book belongs to the authenticated user
-      if ($book->userId !== $user['id']) {
+      if ($book->user_id !== $user['id']) {
         http_response_code(403);
         echo json_encode(['error' => 'Unauthorized to delete this listing']);
         return;
@@ -133,35 +159,35 @@ class BookController
     }
   }
 
-  public function getRecommendations() {
+  public function getRecommendations()
+  {
     try {
-        $user = AuthMiddleware::authenticate();
-        
-        // Get preferences from query params
-        if (!isset($_GET['preferences'])) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Preferences parameter is required']);
-            return;
-        }
+      $user = AuthMiddleware::authenticate();
 
-        $preferences = json_decode($_GET['preferences'], true);
+      // Get preferences from query params
+      if (!isset($_GET['preferences'])) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Preferences parameter is required']);
+        return;
+      }
 
-        if (!is_array($preferences)) {
-            http_response_code(400);
-            echo json_encode(['error' => 'Invalid preferences format']);
-            return;
-        }
+      $preferences = json_decode($_GET['preferences'], true);
 
-        // Pass user ID and preferences to model
-        $books = $this->book->findRecommendations($user['id'], $preferences);
+      if (!is_array($preferences)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Invalid preferences format']);
+        return;
+      }
 
-        http_response_code(200);
-        echo json_encode($books);
+      // Pass user ID and preferences to model
+      $books = $this->book->findRecommendations($user['id'], $preferences);
 
+      http_response_code(200);
+      echo json_encode($books);
     } catch (\Exception $e) {
-        error_log("Error fetching recommendations: " . $e->getMessage());
-        http_response_code(500);
-        echo json_encode(['error' => 'Internal server error']);
+      error_log("Error fetching recommendations: " . $e->getMessage());
+      http_response_code(500);
+      echo json_encode(['error' => 'Internal server error']);
     }
   }
 
