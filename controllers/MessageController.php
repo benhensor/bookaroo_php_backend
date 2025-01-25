@@ -62,7 +62,7 @@ class MessageController {
         'recipient_id' => $data['recipient_id'],
         'book_id' => $data['book_id'],
         'message' => $data['message'],
-        'is_read' => false
+        'is_read' => 0
       ]);
 
       http_response_code(201);

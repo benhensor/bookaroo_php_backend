@@ -19,7 +19,7 @@ class Message {
       $data['recipient_id'], 
       $data['book_id'],
       $data['message'],
-      $data['is_read'] ?? false
+      $data['is_read'] ? 1 : 0
     ]);
   }
 
@@ -70,14 +70,14 @@ class Message {
 
   public function markAsRead($id) {
     $stmt = $this->db->prepare("
-      UPDATE messages SET is_read = true WHERE id = ?
+      UPDATE messages SET is_read = 1 WHERE id = ?
     ");
     return $stmt->execute([$id]);
   }
 
   public function markAsUnread($id) {
     $stmt = $this->db->prepare("
-      UPDATE messages SET is_read = false WHERE id = ?
+      UPDATE messages SET is_read = 0 WHERE id = ?
     ");
     return $stmt->execute([$id]);
   }

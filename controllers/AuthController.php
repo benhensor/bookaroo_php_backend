@@ -84,7 +84,7 @@ class AuthController {
                 return;
             }
             
-            // Generate JWT with same structure as Node version
+            // Generate JWT 
             $token = JWT::encode([
                 'id' => $user['id'],
                 'email' => $user['email'],
@@ -92,11 +92,11 @@ class AuthController {
                 'iat' => time() // issued at time
             ], $_ENV['JWT_SECRET'], 'HS256');
             
-            // Set cookie with same options as Node version
+            // Set cookie 
             setcookie('authToken', $token, [
                 'expires' => time() + (24 * 60 * 60),
                 'path' => '/',
-                'domain' => $_ENV['COOKIE_DOMAIN'] ?? null,
+                'domain' => $_ENV['COOKIE_DOMAIN'] || 'benhensor.co.uk',
                 'secure' => true,
                 'httponly' => true,
                 'samesite' => 'None'

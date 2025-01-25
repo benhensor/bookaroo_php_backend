@@ -19,7 +19,7 @@ switch ($method) {
         $controller->getLikedBooks();
         break;
 
-      case ':id':
+      case 'getuser':
         $controller->getUserById($pathParts[4]);
         break;
 
