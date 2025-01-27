@@ -129,100 +129,21 @@ class BookController
     }
   }
 
-  public function getListedBooks()
-  {
-    try {
-      $user = AuthMiddleware::authenticate();
-
-      $books = $this->book->findAllWithUser([
-        'where' => ['userId' => $user['id']],
-        'include' => [
-          'user' => [
-            'attributes' => [
-              'id',
-              'email',
-              'username',
-              'postcode',
-              'latitude',
-              'longitude'
-            ]
-          ]
-        ]
-      ]);
-
-      http_response_code(200);
-      echo json_encode($books);
-    } catch (\Exception $e) {
-      error_log("Error in getListedBooks: " . $e->getMessage());
-      http_response_code(500);
-      echo json_encode(['error' => $e->getMessage()]);
-    }
-  }
-
-  public function getRecommendations()
-  {
-    try {
-      $user = AuthMiddleware::authenticate();
-
-      // Get preferences from query params
-      if (!isset($_GET['preferences'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Preferences parameter is required']);
-        return;
-      }
-
-      $preferences = json_decode($_GET['preferences'], true);
-
-      if (!is_array($preferences)) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Invalid preferences format']);
-        return;
-      }
-
-      // Pass user ID and preferences to model
-      $books = $this->book->findRecommendations($user['id'], $preferences);
-
-      http_response_code(200);
-      echo json_encode($books);
-    } catch (\Exception $e) {
-      error_log("Error fetching recommendations: " . $e->getMessage());
-      http_response_code(500);
-      echo json_encode(['error' => 'Internal server error']);
-    }
-  }
-
   public function getAllBooks()
   {
     try {
+      $user = AuthMiddleware::authenticate();
+      if (!$user) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Unauthorized']);
+        return;
+      }
       $books = $this->book->findAll();
 
       http_response_code(200);
       echo json_encode($books);
     } catch (\Exception $e) {
       error_log("Error fetching all books: " . $e->getMessage());
-      http_response_code(500);
-      echo json_encode(['error' => 'Internal server error']);
-    }
-  }
-
-  public function searchBooks()
-  {
-    try {
-      $user = AuthMiddleware::authenticate();
-      $query = $_GET['query'] ?? null;
-
-      if (!$query) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Query parameter is required']);
-        return;
-      }
-
-      $books = $this->book->search($query, $user['id']);
-
-      http_response_code(200);
-      echo json_encode($books);
-    } catch (\Exception $e) {
-      error_log("Error searching books: " . $e->getMessage());
       http_response_code(500);
       echo json_encode(['error' => 'Internal server error']);
     }
