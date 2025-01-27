@@ -95,8 +95,8 @@ class AuthController {
             // Set cookie 
             setcookie('authToken', $token, [
                 'expires' => time() + (24 * 60 * 60),
-                'path' => '/',
-                'domain' => $_ENV['COOKIE_DOMAIN'] || 'benhensor.co.uk',
+                'path' => '/bookaroo/',
+                'domain' => $_ENV['COOKIE_DOMAIN'] ?? 'benhensor.co.uk',
                 'secure' => true,
                 'httponly' => true,
                 'samesite' => 'None'

@@ -129,23 +129,42 @@ class BookController
     }
   }
 
-  public function getAllBooks()
-  {
+  public function getAllBooks() {
     try {
       $user = AuthMiddleware::authenticate();
       if (!$user) {
-        http_response_code(401);
-        echo json_encode(['error' => 'Unauthorized']);
-        return;
+        throw new \Exception('User not authenticated');
       }
+      
       $books = $this->book->findAll();
-
-      http_response_code(200);
-      echo json_encode($books);
+      if (!is_array($books)) {
+        throw new \Exception('Invalid books data format');
+      }
+      
+      // Debug
+      error_log("Total books found: " . count($books));
+      
+      // Clear any previous output
+      ob_clean();
+      
+      // Set headers
+      header('Content-Type: application/json; charset=utf-8');
+      
+      // Encode with error checking
+      $json = json_encode($books, JSON_THROW_ON_ERROR);
+      if ($json === false) {
+        throw new \Exception('JSON encoding failed: ' . json_last_error_msg());
+      }
+      
+      echo $json;
+        
     } catch (\Exception $e) {
-      error_log("Error fetching all books: " . $e->getMessage());
+      error_log("Error in getAllBooks: " . $e->getMessage());
       http_response_code(500);
-      echo json_encode(['error' => 'Internal server error']);
+      echo json_encode([
+        'error' => 'Server error',
+        'message' => $e->getMessage()
+      ]);
     }
   }
 }
